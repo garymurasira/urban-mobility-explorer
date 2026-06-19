@@ -188,6 +188,23 @@ def drop_outside_january_2019(df, log):
     return df
 
 
+def build_exclusion_log(records):
+    """Turn the list of per-rule records into a DataFrame with a TOTAL row.
+
+    Columns: ``rule``, ``reason``, ``rows_removed``. The appended TOTAL row sums
+    rows_removed across every rule so the log doubles as a removal summary.
+    """
+    log_df = pd.DataFrame(records, columns=["rule", "reason", "rows_removed"])
+    total = pd.DataFrame(
+        [{
+            "rule": "TOTAL",
+            "reason": "all rules combined",
+            "rows_removed": int(log_df["rows_removed"].sum()),
+        }]
+    )
+    return pd.concat([log_df, total], ignore_index=True)
+
+
 def clean_trips(df):
     """Run all integrity rules in order; return (clean_df, exclusion_log_df)."""
     df = df.copy()
@@ -202,4 +219,5 @@ def clean_trips(df):
     df = filter_implausible_speed(df, log)
     df = drop_outside_january_2019(df, log)
 
-    return df, pd.DataFrame(log)
+    clean_df = df.reset_index(drop=True)
+    return clean_df, build_exclusion_log(log)

@@ -1,0 +1,33 @@
+:root {
+  /* Taxi palette: white base, yellow accent */
+  --color-bg: #FFFFFF;
+  --color-surface: #FAFAFA;
+  --color-yellow: #F5C518;
+  --color-yellow-dark: #D9A900;
+  --color-text: #1A1A1A;
+  --color-text-muted: #5C5C5C;
+  --color-border: #ECECEC;
+
+  --navbar-height: 72px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --font-base: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.placeholder-section {
+  padding: calc(var(--navbar-height) + 48px) 24px 48px;
+  max-width: 960px;
+  margin: 0 auto;
+  color: var(--color-text-muted);
+}

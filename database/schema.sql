@@ -25,3 +25,36 @@ CREATE TABLE payment_types (
     description VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE trips (
+    trip_id INT PRIMARY KEY AUTO_INCREMENT,
+    vendor_id INT,
+    pickup_datetime DATETIME NOT NULL,
+    dropoff_datetime DATETIME NOT NULL,
+    passenger_count INT,
+    trip_distance DECIMAL(8,2) NOT NULL,
+    rate_code_id INT,
+    pu_location_id INT NOT NULL,
+    do_location_id INT NOT NULL,
+    payment_type_id INT,
+    fare_amount DECIMAL(8,2) NOT NULL,
+    extra DECIMAL(8,2),
+    mta_tax DECIMAL(8,2),
+    tip_amount DECIMAL(8,2),
+    tolls_amount DECIMAL(8,2),
+    improvement_surcharge DECIMAL(8,2),
+    congestion_surcharge DECIMAL(8,2),
+    total_amount DECIMAL(8,2) NOT NULL,
+    trip_duration_min DECIMAL(8,2),
+    avg_speed_mph DECIMAL(8,2),
+    fare_per_mile DECIMAL(8,2),
+    tip_pct DECIMAL(6,4),
+    is_cross_borough BOOLEAN,
+    pickup_hour TINYINT,
+    day_of_week TINYINT,
+
+    FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id),
+    FOREIGN KEY (rate_code_id) REFERENCES rate_codes(rate_code_id),
+    FOREIGN KEY (pu_location_id) REFERENCES zones(location_id),
+    FOREIGN KEY (do_location_id) REFERENCES zones(location_id),
+    FOREIGN KEY (payment_type_id) REFERENCES payment_types(payment_type_id)
+) ENGINE=InnoDB;

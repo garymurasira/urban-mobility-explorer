@@ -1,0 +1,13 @@
+rule,reason,rows_removed
+missing_passenger_count,passenger_count was null; dropped (imputing a rider count is not defensible),0
+missing_ratecode,RatecodeID null relabelled to 99 (unknown); 0 values filled,0
+missing_congestion_surcharge,congestion_surcharge null filled with 0.0 (not broadly applied in Jan 2019); 4855978 values filled,0
+duplicate_trips,exact duplicate rows (all columns identical) removed,0
+non_positive_duration,dropoff_datetime <= pickup_datetime (zero or negative trip time),6294
+non_positive_distance,trip_distance <= 0,48801
+extreme_distance,"trip_distance > 100.0 miles (removed, not capped)",32
+negative_fare,fare_amount < 0 or total_amount < 0,5698
+implausible_passenger_count,passenger_count outside 1-6 (0 treated as invalid),115626
+implausible_speed,implied avg speed > 100.0 mph or non-finite,5236
+pickup_outside_january_2019,"pickup_datetime outside [2019-01-01, 2019-02-01)",508
+TOTAL,all rules combined,182195

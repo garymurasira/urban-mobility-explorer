@@ -16,10 +16,17 @@ Output: trips DataFrame enriched with borough/zone columns; a centroid table.
 
 from pathlib import Path
 
+import geopandas as gpd
 import pandas as pd
 
-# Default raw input location (git-ignored).
+# Default raw input locations (git-ignored).
 ZONE_LOOKUP_PATH = Path("data/raw/taxi_zone_lookup.csv")
+ZONE_SHAPEFILE_PATH = Path("data/raw/taxi_zones/taxi_zones.shp")
+
+# The TLC shapefile ships in NY State Plane (feet); reproject to WGS84 degrees
+# before computing centroids so lat/lon come out in degrees.
+SHAPEFILE_CRS = 2263
+WGS84_CRS = 4326
 
 
 def load_zone_lookup(path=ZONE_LOOKUP_PATH):
@@ -68,3 +75,28 @@ def attach_zones(trips_df, zones_df):
     merged = trips_df.merge(pu_zones, on="PULocationID", how="left")
     merged = merged.merge(do_zones, on="DOLocationID", how="left")
     return merged
+
+
+def load_zone_centroids(shp_path=ZONE_SHAPEFILE_PATH):
+    """Compute each zone's centroid latitude/longitude from the shapefile.
+
+    The shapefile is in a projected CRS (EPSG:2263, NY State Plane in feet); it
+    is reprojected to EPSG:4326 *before* computing centroids so the result is in
+    geographic degrees. ``LocationID`` matches the lookup IDs.
+
+    Returns:
+        DataFrame with ``location_id``, ``centroid_lat``, ``centroid_lon``.
+    """
+    gdf = gpd.read_file(shp_path)
+
+    # Reproject to WGS84 degrees before taking centroids (per the assignment).
+    gdf = gdf.to_crs(WGS84_CRS)
+    centroids = gdf.geometry.centroid
+
+    return pd.DataFrame(
+        {
+            "location_id": gdf["LocationID"].astype("int64"),
+            "centroid_lat": centroids.y,
+            "centroid_lon": centroids.x,
+        }
+    ).reset_index(drop=True)

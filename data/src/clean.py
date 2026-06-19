@@ -172,6 +172,22 @@ def filter_implausible_speed(df, log):
     return df
 
 
+def drop_outside_january_2019(df, log):
+    """Remove trips whose pickup falls outside January 2019.
+
+    The file carries stragglers from other periods (2018 — and even older
+    stray timestamps). Keep only the half-open window
+    [2019-01-01, 2019-02-01).
+    """
+    before = len(df)
+    keep = (df[PICKUP_COL] >= JANUARY_2019_START) & (df[PICKUP_COL] < FEBRUARY_2019_START)
+    df = df[keep]
+    _record(log, "pickup_outside_january_2019",
+            "pickup_datetime outside [2019-01-01, 2019-02-01)",
+            before, len(df))
+    return df
+
+
 def clean_trips(df):
     """Run all integrity rules in order; return (clean_df, exclusion_log_df)."""
     df = df.copy()
@@ -184,5 +200,6 @@ def clean_trips(df):
     df = remove_negative_fare(df, log)
     df = filter_implausible_passenger_count(df, log)
     df = filter_implausible_speed(df, log)
+    df = drop_outside_january_2019(df, log)
 
     return df, pd.DataFrame(log)

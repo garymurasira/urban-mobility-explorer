@@ -6,3 +6,8 @@ CREATE TABLE zones (
     centroid_lat  DECIMAL(9,6),
     centroid_lon  DECIMAL(9,6)
 ) ENGINE=InnoDB;
+
+CREATE TABLE vendors (
+    vendor_id    INT PRIMARY KEY,
+    vendor_name  VARCHAR(50) NOT NULL
+) ENGINE=InnoDB;

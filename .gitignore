@@ -1,0 +1,17 @@
+# Local-only data — never commit (raw inputs, full processed outputs)
+data/raw/
+data/processed/
+
+# Python artifacts
+**/__pycache__/
+*.parquet
+.venv/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# Local working guide (context only — not part of the codebase)
+CLAUDE.md

@@ -58,3 +58,10 @@ CREATE TABLE trips (
     FOREIGN KEY (do_location_id) REFERENCES zones(location_id),
     FOREIGN KEY (payment_type_id) REFERENCES payment_types(payment_type_id)
 ) ENGINE=InnoDB;
+
+
+
+CREATE INDEX idx_trips_pickup_datetime ON trips(pickup_datetime);
+CREATE INDEX idx_trips_pu_location ON trips(pu_location_id);
+CREATE INDEX idx_trips_do_location ON trips(do_location_id);
+CREATE INDEX idx_trips_payment_type ON trips(payment_type_id);

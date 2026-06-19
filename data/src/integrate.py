@@ -6,15 +6,65 @@ Attach geographic context to each trip:
 - read the `taxi_zones` shapefile (geopandas) and compute each zone's centroid
   lat/lon for mapping and distance features.
 
+Trip column names are kept exactly as the TLC ships them at this stage
+(``PULocationID``/``DOLocationID``); renaming to the snake_case output contract
+(CLAUDE.md §4) happens later in normalization, not here.
+
 Input:  raw trips DataFrame + data/raw/taxi_zone_lookup.csv + data/raw/taxi_zones/
-Output: trips DataFrame enriched with borough/zone and centroid columns.
+Output: trips DataFrame enriched with borough/zone columns; a centroid table.
 """
 
-# import pandas as pd
-# import geopandas as gpd
+from pathlib import Path
+
+import pandas as pd
+
+# Default raw input location (git-ignored).
+ZONE_LOOKUP_PATH = Path("data/raw/taxi_zone_lookup.csv")
 
 
-def integrate_zones(trips):
-    """Join zone lookup and shapefile centroids onto the trips DataFrame."""
-    # TODO: merge taxi_zone_lookup on PU/DO LocationID; compute zone centroids
-    raise NotImplementedError
+def load_zone_lookup(path=ZONE_LOOKUP_PATH):
+    """Read the taxi zone lookup table.
+
+    Columns: ``LocationID``, ``Borough``, ``Zone``, ``service_zone``.
+    """
+    return pd.read_csv(path)
+
+
+def attach_zones(trips_df, zones_df):
+    """Left-join borough/zone info onto trips for both pickup and dropoff.
+
+    The lookup is merged twice — once on ``PULocationID`` and once on
+    ``DOLocationID`` — producing the prefixed columns ``pu_borough``,
+    ``pu_zone``, ``pu_service_zone`` and ``do_borough``, ``do_zone``,
+    ``do_service_zone``. Left joins keep every trip: unmatched IDs (e.g. 264/265
+    "Unknown") survive with null zone columns and are handled in cleaning.
+
+    Args:
+        trips_df: trips DataFrame with raw ``PULocationID``/``DOLocationID``.
+        zones_df: the lookup DataFrame from ``load_zone_lookup``.
+
+    Returns:
+        A new DataFrame with the six pickup/dropoff zone columns added.
+    """
+    # Pickup-side lookup: rename to pu_* and key on LocationID.
+    pu_zones = zones_df.rename(
+        columns={
+            "LocationID": "PULocationID",
+            "Borough": "pu_borough",
+            "Zone": "pu_zone",
+            "service_zone": "pu_service_zone",
+        }
+    )
+    # Dropoff-side lookup: rename to do_* and key on LocationID.
+    do_zones = zones_df.rename(
+        columns={
+            "LocationID": "DOLocationID",
+            "Borough": "do_borough",
+            "Zone": "do_zone",
+            "service_zone": "do_service_zone",
+        }
+    )
+
+    merged = trips_df.merge(pu_zones, on="PULocationID", how="left")
+    merged = merged.merge(do_zones, on="DOLocationID", how="left")
+    return merged

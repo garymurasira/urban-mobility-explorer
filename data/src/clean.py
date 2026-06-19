@@ -83,11 +83,22 @@ def handle_missing_values(df, log):
     return df
 
 
+def drop_duplicate_trips(df, log):
+    """Drop exact duplicate trip rows (all columns identical)."""
+    before = len(df)
+    df = df.drop_duplicates()
+    _record(log, "duplicate_trips",
+            "exact duplicate rows (all columns identical) removed",
+            before, len(df))
+    return df
+
+
 def clean_trips(df):
     """Run all integrity rules in order; return (clean_df, exclusion_log_df)."""
     df = df.copy()
     log = []
 
     df = handle_missing_values(df, log)
+    df = drop_duplicate_trips(df, log)
 
     return df, pd.DataFrame(log)

@@ -89,6 +89,11 @@ def load_zone_centroids(shp_path=ZONE_SHAPEFILE_PATH):
     """
     gdf = gpd.read_file(shp_path)
 
+    # A few zones (e.g. LocationID 56, 103) ship as multiple polygon features;
+    # dissolve by LocationID so each zone is one geometry and the centroid table
+    # has a unique key for Gary's zones dimension.
+    gdf = gdf.dissolve(by="LocationID").reset_index()
+
     # Reproject to WGS84 degrees before taking centroids (per the assignment).
     gdf = gdf.to_crs(WGS84_CRS)
     centroids = gdf.geometry.centroid

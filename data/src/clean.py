@@ -135,6 +135,43 @@ def remove_negative_fare(df, log):
     return df
 
 
+def filter_implausible_passenger_count(df, log):
+    """Remove trips whose passenger_count is outside 1-6.
+
+    0 is treated as invalid (a trip carries at least one rider); 7+ exceeds a
+    standard yellow cab's seating capacity.
+    """
+    before = len(df)
+    keep = (df["passenger_count"] >= PASSENGER_COUNT_MIN) & (
+        df["passenger_count"] <= PASSENGER_COUNT_MAX
+    )
+    df = df[keep]
+    _record(log, "implausible_passenger_count",
+            f"passenger_count outside {PASSENGER_COUNT_MIN}-{PASSENGER_COUNT_MAX} "
+            f"(0 treated as invalid)",
+            before, len(df))
+    return df
+
+
+def filter_implausible_speed(df, log):
+    """Remove trips whose implied average speed is non-finite or too high.
+
+    Average speed = trip_distance / duration_hours. Duration is recomputed
+    locally only for this filter (the real ``avg_speed_mph`` feature is produced
+    later in features.py). Earlier steps guarantee positive duration and
+    distance, so the divide is safe; the non-finite guard is belt-and-braces.
+    """
+    before = len(df)
+    duration_hours = (df[DROPOFF_COL] - df[PICKUP_COL]).dt.total_seconds() / 3600.0
+    avg_speed = df["trip_distance"] / duration_hours
+    keep = np.isfinite(avg_speed) & (avg_speed <= MAX_AVG_SPEED_MPH)
+    df = df[keep]
+    _record(log, "implausible_speed",
+            f"implied avg speed > {MAX_AVG_SPEED_MPH} mph or non-finite",
+            before, len(df))
+    return df
+
+
 def clean_trips(df):
     """Run all integrity rules in order; return (clean_df, exclusion_log_df)."""
     df = df.copy()
@@ -145,5 +182,7 @@ def clean_trips(df):
     df = remove_non_positive_duration(df, log)
     df = remove_invalid_distance(df, log)
     df = remove_negative_fare(df, log)
+    df = filter_implausible_passenger_count(df, log)
+    df = filter_implausible_speed(df, log)
 
     return df, pd.DataFrame(log)

@@ -18,3 +18,10 @@ CREATE TABLE rate_codes (
     rate_code_id INT PRIMARY KEY,
     description VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
+
+
+CREATE TABLE payment_types (
+    payment_type_id INT PRIMARY KEY,
+    description VARCHAR(50) NOT NULL
+) ENGINE=InnoDB;
+

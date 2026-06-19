@@ -23,6 +23,24 @@ DROPOFF_COL = "tpep_dropoff_datetime"
 # TLC does not record cash tips (see add_features).
 CARD_PAYMENT_TYPE = 1
 
+# time_of_day buckets by pickup hour (inclusive ranges). Hours not covered by
+# morning/afternoon/evening fall to night, i.e. 00-05 and 22-23.
+MORNING_HOURS = range(6, 12)     # 06:00-11:59
+AFTERNOON_HOURS = range(12, 17)  # 12:00-16:59
+EVENING_HOURS = range(17, 22)    # 17:00-21:59
+# NIGHT = remaining hours (22-23 and 00-05).
+
+
+def _time_of_day(hour):
+    """Map an array of pickup hours (0-23) to morning/afternoon/evening/night."""
+    conditions = [
+        hour.isin(list(MORNING_HOURS)),
+        hour.isin(list(AFTERNOON_HOURS)),
+        hour.isin(list(EVENING_HOURS)),
+    ]
+    choices = ["morning", "afternoon", "evening"]
+    return np.select(conditions, choices, default="night")
+
 
 def add_features(df):
     """Compute the derived feature columns required by the §4 contract.
@@ -63,5 +81,10 @@ def add_features(df):
     # not-confirmed-cross-borough (False) rather than inflating the rate.
     both_known = df["pu_borough"].notna() & df["do_borough"].notna()
     df["is_cross_borough"] = (df["pu_borough"] != df["do_borough"]) & both_known
+
+    # Calendar features from the pickup timestamp.
+    df["pickup_hour"] = df[PICKUP_COL].dt.hour                 # 0-23
+    df["pickup_day_of_week"] = df[PICKUP_COL].dt.dayofweek     # 0=Mon .. 6=Sun
+    df["time_of_day"] = _time_of_day(df["pickup_hour"])
 
     return df

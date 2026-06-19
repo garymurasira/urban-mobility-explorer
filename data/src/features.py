@@ -88,3 +88,87 @@ def add_features(df):
     df["time_of_day"] = _time_of_day(df["pickup_hour"])
 
     return df
+
+
+# --- Schema contract (CLAUDE.md §4) -----------------------------------------
+# Raw TLC name -> agreed snake_case contract name. Names already in contract
+# form (e.g. trip_distance, the itemized fare columns) are intentionally absent.
+RENAME_MAP = {
+    "VendorID": "vendor_id",
+    "tpep_pickup_datetime": "pickup_datetime",
+    "tpep_dropoff_datetime": "dropoff_datetime",
+    "RatecodeID": "rate_code_id",
+    "PULocationID": "pu_location_id",
+    "DOLocationID": "do_location_id",
+}
+
+# Final dtypes grouped by target type.
+INT_COLUMNS = [
+    "vendor_id", "passenger_count", "rate_code_id",
+    "pu_location_id", "do_location_id", "payment_type",
+    "pickup_hour", "pickup_day_of_week",
+]
+FLOAT_COLUMNS = [
+    "trip_distance",
+    "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount",
+    "improvement_surcharge", "congestion_surcharge", "total_amount",
+    "trip_duration_min", "avg_speed_mph", "fare_per_mile", "tip_pct",
+]
+STRING_COLUMNS = ["store_and_fwd_flag", "time_of_day"]
+DATETIME_COLUMNS = ["pickup_datetime", "dropoff_datetime"]
+
+# Exact contract output columns, in order.
+CONTRACT_COLUMNS = [
+    "vendor_id",
+    "pickup_datetime",
+    "dropoff_datetime",
+    "passenger_count",
+    "trip_distance",
+    "rate_code_id",
+    "store_and_fwd_flag",
+    "pu_location_id",
+    "do_location_id",
+    "payment_type",
+    "fare_amount",
+    "extra",
+    "mta_tax",
+    "tip_amount",
+    "tolls_amount",
+    "improvement_surcharge",
+    "congestion_surcharge",
+    "total_amount",
+    "trip_duration_min",
+    "avg_speed_mph",
+    "fare_per_mile",
+    "tip_pct",
+    "is_cross_borough",
+    "pickup_hour",
+    "pickup_day_of_week",
+    "time_of_day",
+]
+
+
+def normalize_schema(df):
+    """Rename to the §4 contract, enforce dtypes, return the contract columns.
+
+    The ``pu_borough``/``do_borough`` and zone helper columns added in integrate
+    are NOT part of the trips contract — boroughs/zones live in Gary's separate
+    zones dimension — so they are dropped here by selecting only CONTRACT_COLUMNS.
+    """
+    df = df.rename(columns=RENAME_MAP)
+
+    # Enforce final dtypes. Nullable Int64/Float64 from load/clean collapse to
+    # plain int64/float64 here (cleaning guarantees the id/count columns are
+    # non-null; float columns keep NaN for the guarded ratio features).
+    for col in INT_COLUMNS:
+        df[col] = df[col].astype("int64")
+    for col in FLOAT_COLUMNS:
+        df[col] = df[col].astype("float64")
+    df["is_cross_borough"] = df["is_cross_borough"].astype(bool)
+    for col in STRING_COLUMNS:
+        df[col] = df[col].astype("string")
+    for col in DATETIME_COLUMNS:
+        df[col] = pd.to_datetime(df[col])
+
+    # Select exactly the contract columns in order (drops borough/zone helpers).
+    return df[CONTRACT_COLUMNS].copy()

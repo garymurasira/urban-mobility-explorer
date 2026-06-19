@@ -44,4 +44,24 @@ def add_features(df):
         duration_hours > 0
     )
 
+    # Fare per mile = fare_amount / trip_distance. NaN where distance is 0.
+    df["fare_per_mile"] = (df["fare_amount"] / df["trip_distance"]).where(
+        df["trip_distance"] > 0
+    )
+
+    # Tip percentage = tip_amount / fare_amount, card trips only. TLC does not
+    # record cash tips, so for non-card trips tip_amount is structurally 0 and a
+    # tip rate would be misleading — restrict to card and NaN everything else
+    # (also NaN where fare_amount is 0 to guard the division).
+    is_card = df["payment_type"] == CARD_PAYMENT_TYPE
+    df["tip_pct"] = (df["tip_amount"] / df["fare_amount"]).where(
+        is_card & (df["fare_amount"] > 0)
+    )
+
+    # Cross-borough flag: True only when both boroughs are known and differ.
+    # Unknown zones (null borough from the integrate left-join) are treated as
+    # not-confirmed-cross-borough (False) rather than inflating the rate.
+    both_known = df["pu_borough"].notna() & df["do_borough"].notna()
+    df["is_cross_borough"] = (df["pu_borough"] != df["do_borough"]) & both_known
+
     return df

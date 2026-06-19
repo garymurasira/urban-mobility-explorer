@@ -93,6 +93,48 @@ def drop_duplicate_trips(df, log):
     return df
 
 
+def remove_non_positive_duration(df, log):
+    """Remove trips where dropoff is at or before pickup (zero/negative time)."""
+    before = len(df)
+    df = df[df[DROPOFF_COL] > df[PICKUP_COL]]
+    _record(log, "non_positive_duration",
+            "dropoff_datetime <= pickup_datetime (zero or negative trip time)",
+            before, len(df))
+    return df
+
+
+def remove_invalid_distance(df, log):
+    """Remove non-positive distances, then remove implausibly long trips.
+
+    Extreme distances (> ``MAX_TRIP_DISTANCE_MILES``) are removed rather than
+    capped: a capped value would be a fabricated distance, whereas removal keeps
+    the surviving distances honest.
+    """
+    # trip_distance <= 0.
+    before = len(df)
+    df = df[df["trip_distance"] > 0]
+    _record(log, "non_positive_distance",
+            "trip_distance <= 0", before, len(df))
+
+    # trip_distance > 100 miles (implausible for a city trip) -> remove.
+    before = len(df)
+    df = df[df["trip_distance"] <= MAX_TRIP_DISTANCE_MILES]
+    _record(log, "extreme_distance",
+            f"trip_distance > {MAX_TRIP_DISTANCE_MILES} miles (removed, not capped)",
+            before, len(df))
+    return df
+
+
+def remove_negative_fare(df, log):
+    """Remove trips with a negative fare_amount or total_amount."""
+    before = len(df)
+    df = df[(df["fare_amount"] >= 0) & (df["total_amount"] >= 0)]
+    _record(log, "negative_fare",
+            "fare_amount < 0 or total_amount < 0",
+            before, len(df))
+    return df
+
+
 def clean_trips(df):
     """Run all integrity rules in order; return (clean_df, exclusion_log_df)."""
     df = df.copy()
@@ -100,5 +142,8 @@ def clean_trips(df):
 
     df = handle_missing_values(df, log)
     df = drop_duplicate_trips(df, log)
+    df = remove_non_positive_duration(df, log)
+    df = remove_invalid_distance(df, log)
+    df = remove_negative_fare(df, log)
 
     return df, pd.DataFrame(log)

@@ -33,3 +33,13 @@ PAYMENT_TYPES = [(1, "Credit card"),
                  (4, "Dispute"),
                  (5, "Unknown"),
                  (6, "Voided trip"),]
+
+ZONES_CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "sample", "zones_reference.csv")
+
+
+def truncate_all_tables(cursor):
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    for table in ["trips", "zones", "vendors", "rate_codes", "payment_types"]:
+        cursor.execute(f"TRUNCATE TABLE {table}")
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    print("All tables cleared.")

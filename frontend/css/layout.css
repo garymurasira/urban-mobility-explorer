@@ -1,0 +1,22 @@
+.section {
+  padding: 48px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  scroll-margin-top: var(--navbar-height);
+}
+
+.section__header {
+  margin-bottom: 28px;
+}
+
+.section__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.section__subtitle {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.95rem;
+}

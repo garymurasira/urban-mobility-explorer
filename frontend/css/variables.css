@@ -24,10 +24,3 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
 }
-
-.placeholder-section {
-  padding: calc(var(--navbar-height) + 48px) 24px 48px;
-  max-width: 960px;
-  margin: 0 auto;
-  color: var(--color-text-muted);
-}

@@ -6,6 +6,9 @@
   <title>Urban Mobility Explorer &middot; NYC Yellow Taxi, Jan 2019</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/filters.css">
+  <link rel="stylesheet" href="css/kpi.css">
 </head>
 <body>
 
@@ -34,12 +37,53 @@
   </header>
 
   <main>
-    <section id="overview" class="placeholder-section">
-      <h1>Dashboard</h1>
-      <p>KPI cards, charts, and filters </p>
+    <section id="overview" class="section">
+      <div class="section__header">
+        <h1 class="section__title">Where and when does NYC move?</h1>
+        <p class="section__subtitle">
+          1.9M+ cleaned yellow taxi trips, January 2019. Filter below to explore.
+        </p>
+      </div>
+
+      <form class="filter-bar" id="filter-bar">
+        <div class="filter-field">
+          <label for="filter-date-from">From</label>
+          <input type="date" id="filter-date-from" name="date_from" min="2019-01-01" max="2019-01-31">
+        </div>
+        <div class="filter-field">
+          <label for="filter-date-to">To</label>
+          <input type="date" id="filter-date-to" name="date_to" min="2019-01-01" max="2019-01-31">
+        </div>
+        <div class="filter-field">
+          <label for="filter-borough">Borough</label>
+          <select id="filter-borough" name="borough">
+            <option value="">All boroughs</option>
+            <option value="Manhattan">Manhattan</option>
+            <option value="Brooklyn">Brooklyn</option>
+            <option value="Queens">Queens</option>
+            <option value="Bronx">Bronx</option>
+            <option value="Staten Island">Staten Island</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="filter-payment">Payment type</label>
+          <select id="filter-payment" name="payment_type">
+            <option value="">All payment types</option>
+            <option value="card">Credit card</option>
+            <option value="cash">Cash</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button type="button" class="filter-bar__reset" id="filter-reset">Reset filters</button>
+      </form>
+
+      <div class="kpi-grid" id="kpi-grid"></div>
     </section>
   </main>
 
   <script src="js/navbar.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/kpi.js"></script>
 </body>
 </html>

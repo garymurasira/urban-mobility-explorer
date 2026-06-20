@@ -186,3 +186,30 @@ def load_trips(cursor):
             total_failed   += failed
 
     print(f"trips: {total_success} rows loaded, {total_failed} rows failed.")
+
+
+def main():
+    print("Connecting to database...")
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    print("Clearing existing data...")
+    truncate_all_tables(cursor)
+
+    print("Loading dimension tables...")
+    load_zones(cursor)
+    load_vendors(cursor)
+    load_rate_codes(cursor)
+    load_payment_types(cursor)
+
+    print("Loading trips...")
+    load_trips(cursor)
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+    print("Done.")
+
+
+if __name__ == "__main__":
+    main()

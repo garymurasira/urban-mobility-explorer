@@ -120,12 +120,17 @@
     setStatus(statusEl, "Loading zone data…");
     API.fetchTopZones(filters)
       .then(function (zones) {
-        setStatus(statusEl, "");
         zonesData = zones;
         initMap();
         renderMarkers(zones);
         renderChart(zones);
         renderTable();
+
+        if (zones.length === 0) {
+          setStatus(statusEl, "No zones match the current filters.");
+        } else {
+          setStatus(statusEl, "");
+        }
       })
       .catch(function () {
         setStatus(statusEl, "Could not load zone data. Try again later.", true);

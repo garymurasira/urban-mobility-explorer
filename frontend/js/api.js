@@ -58,9 +58,49 @@ const API = (function () {
     },
   ];
 
+  // Rough share of citywide pickups per borough, used only to make mock
+  // filtering feel plausible until the real API supplies real numbers.
+  const BOROUGH_SHARE = {
+    Manhattan: 0.62,
+    Brooklyn: 0.18,
+    Queens: 0.15,
+    Bronx: 0.03,
+    "Staten Island": 0.02,
+  };
+
+  const PAYMENT_FARE_FACTOR = { card: 1.05, cash: 0.85, other: 0.95 };
+
+  function daysInRange(filters) {
+    if (!filters.date_from && !filters.date_to) return 31;
+    const from = filters.date_from ? new Date(filters.date_from) : new Date("2019-01-01");
+    const to = filters.date_to ? new Date(filters.date_to) : new Date("2019-01-31");
+    const spanMs = to - from;
+    if (Number.isNaN(spanMs) || spanMs < 0) return 31;
+    return Math.min(31, Math.round(spanMs / 86400000) + 1);
+  }
+
+  function round(value, decimals) {
+    const factor = Math.pow(10, decimals);
+    return Math.round(value * factor) / factor;
+  }
+
   function fetchSummary(filters) {
     if (MOCK_MODE) {
-      return Promise.resolve(MOCK_SUMMARY);
+      filters = filters || {};
+      const dayFraction = daysInRange(filters) / 31;
+      const boroughShare = filters.borough ? BOROUGH_SHARE[filters.borough] || 0.05 : 1;
+      const fareFactor = filters.payment_type ? PAYMENT_FARE_FACTOR[filters.payment_type] || 1 : 1;
+
+      return Promise.resolve({
+        total_trips: Math.round(MOCK_SUMMARY.total_trips * dayFraction * boroughShare),
+        avg_fare: round(MOCK_SUMMARY.avg_fare * fareFactor, 2),
+        avg_distance_mi: MOCK_SUMMARY.avg_distance_mi,
+        avg_duration_min: MOCK_SUMMARY.avg_duration_min,
+        pct_cross_borough: round(
+          MOCK_SUMMARY.pct_cross_borough * (filters.borough ? 0.5 : 1),
+          1
+        ),
+      });
     }
 
     const params = new URLSearchParams(filters || {});
@@ -74,7 +114,16 @@ const API = (function () {
 
   function fetchHourly(filters) {
     if (MOCK_MODE) {
-      return Promise.resolve(MOCK_HOURLY);
+      filters = filters || {};
+      const dayFraction = daysInRange(filters) / 31;
+      const boroughShare = filters.borough ? BOROUGH_SHARE[filters.borough] || 0.05 : 1;
+      const scale = dayFraction * boroughShare;
+
+      return Promise.resolve(
+        MOCK_HOURLY.map(function (row) {
+          return { hour: row.hour, trip_count: Math.round(row.trip_count * scale) };
+        })
+      );
     }
 
     const params = new URLSearchParams(filters || {});
@@ -88,7 +137,15 @@ const API = (function () {
 
   function fetchTopZones(filters) {
     if (MOCK_MODE) {
-      return Promise.resolve(MOCK_TOP_ZONES);
+      filters = filters || {};
+      const dayFraction = daysInRange(filters) / 31;
+      const zones = MOCK_TOP_ZONES.filter(function (zone) {
+        return !filters.borough || zone.borough === filters.borough;
+      }).map(function (zone) {
+        return { ...zone, trip_count: Math.round(zone.trip_count * dayFraction) };
+      });
+
+      return Promise.resolve(zones);
     }
 
     const params = new URLSearchParams(filters || {});

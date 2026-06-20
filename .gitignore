@@ -13,5 +13,4 @@ data/processed/
 # OS
 .DS_Store
 
-# Local working guide (context only — not part of the codebase)
-CLAUDE.md
+./database/.env

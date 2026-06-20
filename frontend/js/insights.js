@@ -1,5 +1,6 @@
 (function () {
   const grid = document.getElementById("insights-grid");
+  const statusEl = document.getElementById("insights-status");
   if (!grid) return;
 
   function render(insights) {
@@ -16,5 +17,13 @@
       .join("");
   }
 
-  API.fetchInsights({}).then(render);
+  setStatus(statusEl, "Loading insights…");
+  API.fetchInsights({})
+    .then(function (insights) {
+      setStatus(statusEl, "");
+      render(insights);
+    })
+    .catch(function () {
+      setStatus(statusEl, "Could not load insights. Try again later.", true);
+    });
 })();

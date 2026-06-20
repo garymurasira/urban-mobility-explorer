@@ -1,5 +1,6 @@
 (function () {
   const canvas = document.getElementById("hourly-chart");
+  const statusEl = document.getElementById("trends-status");
   if (!canvas || typeof Chart === "undefined") return;
 
   let chart = null;
@@ -44,7 +45,15 @@
   }
 
   function load(filters) {
-    API.fetchHourly(filters).then(render);
+    setStatus(statusEl, "Loading hourly trends…");
+    API.fetchHourly(filters)
+      .then(function (hourly) {
+        setStatus(statusEl, "");
+        render(hourly);
+      })
+      .catch(function () {
+        setStatus(statusEl, "Could not load hourly trends. Try again later.", true);
+      });
   }
 
   document.addEventListener("filters:change", function (event) {

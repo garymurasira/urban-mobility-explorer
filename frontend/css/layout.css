@@ -36,3 +36,18 @@
   font-weight: 600;
   margin: 0 0 16px;
 }
+
+.status-text {
+  display: none;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin: 0 0 14px;
+}
+
+.status-text.is-visible {
+  display: block;
+}
+
+.status-text.is-error {
+  color: #B3261E;
+}

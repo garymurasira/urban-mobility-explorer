@@ -2,6 +2,7 @@
   const mapEl = document.getElementById("zones-map");
   const chartCanvas = document.getElementById("zones-chart");
   const tableBody = document.getElementById("zones-table-body");
+  const statusEl = document.getElementById("zones-status");
   if (!mapEl && !chartCanvas && !tableBody) return;
 
   let map = null;
@@ -116,13 +117,19 @@
   }
 
   function load(filters) {
-    API.fetchTopZones(filters).then(function (zones) {
-      zonesData = zones;
-      initMap();
-      renderMarkers(zones);
-      renderChart(zones);
-      renderTable();
-    });
+    setStatus(statusEl, "Loading zone data…");
+    API.fetchTopZones(filters)
+      .then(function (zones) {
+        setStatus(statusEl, "");
+        zonesData = zones;
+        initMap();
+        renderMarkers(zones);
+        renderChart(zones);
+        renderTable();
+      })
+      .catch(function () {
+        setStatus(statusEl, "Could not load zone data. Try again later.", true);
+      });
   }
 
   document.addEventListener("filters:change", function (event) {

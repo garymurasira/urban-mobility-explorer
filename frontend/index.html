@@ -113,6 +113,7 @@
       <div class="trends-grid">
         <div class="card chart-card">
           <h3 class="card__title">Trips by hour of day</h3>
+          <p class="status-text" id="trends-status"></p>
           <canvas id="hourly-chart" height="100"></canvas>
         </div>
       </div>
@@ -123,6 +124,7 @@
         <h2 class="section__title">Zones</h2>
         <p class="section__subtitle">Busiest pickup zones across the city.</p>
       </div>
+      <p class="status-text" id="zones-status"></p>
       <div class="zones-grid">
         <div class="card">
           <h3 class="card__title">Pickup density map</h3>
@@ -154,6 +156,7 @@
         <h2 class="section__title">Insights</h2>
         <p class="section__subtitle">What the data says about how the city moves.</p>
       </div>
+      <p class="status-text" id="insights-status"></p>
       <div class="insights-grid" id="insights-grid"></div>
     </section>
   </main>
@@ -223,6 +226,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/navbar.js"></script>
+  <script src="js/status.js"></script>
   <script src="js/api.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/kpi.js"></script>

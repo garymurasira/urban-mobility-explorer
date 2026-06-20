@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Urban Mobility Explorer &middot; NYC Yellow Taxi, Jan 2019</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/hero.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/filters.css">
   <link rel="stylesheet" href="css/kpi.css">
@@ -15,6 +19,16 @@
   <header class="navbar" id="navbar">
     <div class="navbar__inner">
       <a class="navbar__brand" href="#overview">
+        <span class="navbar__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14l1.4-4.2a2 2 0 0 0-1.9-2.8H5.5a2 2 0 0 0-1.9 2.8L5 17Z"/>
+            <path d="M5 17v2"/>
+            <path d="M19 17v2"/>
+            <path d="M7 10l1-3.5A1.5 1.5 0 0 1 9.4 5.5h5.2A1.5 1.5 0 0 1 16 6.5L17 10"/>
+            <circle cx="7.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+            <circle cx="16.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
         <span class="navbar__title">Urban Mobility<span class="navbar__title-accent"> Explorer</span></span>
       </a>
 
@@ -37,14 +51,20 @@
   </header>
 
   <main>
-    <section id="overview" class="section">
-      <div class="section__header">
-        <h1 class="section__title">Where and when does NYC move?</h1>
-        <p class="section__subtitle">
-          1.9M+ cleaned yellow taxi trips, January 2019. Filter below to explore.
+    <div class="hero">
+      <div class="hero__inner">
+        <span class="hero__eyebrow">
+          <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+          NYC TLC Yellow Taxi &middot; January 2019
+        </span>
+        <h1 class="hero__title">Where and when does New York City move?</h1>
+        <p class="hero__subtitle">
+          1.9M+ cleaned trips, mapped across boroughs, hours, and fares. Filter the data below to explore patterns in urban mobility.
         </p>
       </div>
+    </div>
 
+    <section id="overview" class="section">
       <form class="filter-bar" id="filter-bar">
         <div class="filter-field">
           <label for="filter-date-from">From</label>

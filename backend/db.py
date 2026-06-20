@@ -1,4 +1,7 @@
 import os
+from decimal import Decimal
+from datetime import datetime, date
+
 import mysql.connector
 from dotenv import load_dotenv
 
@@ -16,13 +19,23 @@ def get_connection():
     )
 
 
+def _json_safe(value):
+    """Convert DB types that JSON can't handle into plain types."""
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    return value
+
+
 def run_query(sql, params=None):
-    """Run a SELECT and return rows as a list of dictionaries."""
+    """Run a SELECT and return rows as a list of JSON-safe dictionaries."""
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(sql, params or ())
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+        return [{key: _json_safe(val) for key, val in row.items()} for row in rows]
     finally:
         cursor.close()
         connection.close()

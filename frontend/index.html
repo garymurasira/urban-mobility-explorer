@@ -13,6 +13,10 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/filters.css">
   <link rel="stylesheet" href="css/kpi.css">
+  <link rel="stylesheet" href="css/trends.css">
+  <link rel="stylesheet" href="css/zones.css">
+  <link rel="stylesheet" href="css/insights.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -99,11 +103,68 @@
 
       <div class="kpi-grid" id="kpi-grid"></div>
     </section>
+
+    <section id="trends" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Trends</h2>
+        <p class="section__subtitle">Trip demand by hour of day across the full month.</p>
+      </div>
+      <div class="trends-grid">
+        <div class="card chart-card">
+          <h3 class="card__title">Trips by hour of day</h3>
+          <canvas id="hourly-chart" height="100"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="zones" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Zones</h2>
+        <p class="section__subtitle">Busiest pickup zones across the city.</p>
+      </div>
+      <div class="zones-grid">
+        <div class="card">
+          <h3 class="card__title">Pickup density map</h3>
+          <div id="zones-map"></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title">Top 7 zones by trip count</h3>
+          <canvas id="zones-chart" height="220"></canvas>
+        </div>
+      </div>
+      <div class="card zones-table-card">
+        <h3 class="card__title">All zones</h3>
+        <table class="zone-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-sort-key="zone">Zone</th>
+              <th data-sort-key="borough">Borough</th>
+              <th data-sort-key="trip_count">Trips</th>
+            </tr>
+          </thead>
+          <tbody id="zones-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="insights" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Insights</h2>
+        <p class="section__subtitle">What the data says about how the city moves.</p>
+      </div>
+      <div class="insights-grid" id="insights-grid"></div>
+    </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/api.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/kpi.js"></script>
+  <script src="js/trends.js"></script>
+  <script src="js/zones.js"></script>
+  <script src="js/insights.js"></script>
 </body>
 </html>

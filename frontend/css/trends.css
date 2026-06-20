@@ -1,0 +1,8 @@
+.trends-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.chart-card canvas {
+  max-height: 320px;
+}

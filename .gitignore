@@ -13,4 +13,5 @@ data/processed/
 # OS
 .DS_Store
 
+./database/.env
 data/taxi_zone_lookup.csv

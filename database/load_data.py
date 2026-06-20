@@ -17,7 +17,8 @@ def get_connection():
 
 
 VENDORS = [(1, "Creative Mobile Technologies"),
-           (2, "VeriFone Inc."),]
+           (2, "VeriFone Inc."),
+           (4, "Dependable Driver Systems"),]
 
 RATE_CODES = [(1,  "Standard rate"),
               (2,  "JFK"),
@@ -61,8 +62,8 @@ def load_zones(cursor):
                 row["borough"],
                 row["zone"],
                 row["service_zone"],
-                float(row["centroid_lat"]),
-                float(row["centroid_lon"]),
+                to_float(row["centroid_lat"]),
+                to_float(row["centroid_lon"]),
             ))
     cursor.executemany(insert_sql, rows)
     print(f"zones: {cursor.rowcount} rows loaded.")

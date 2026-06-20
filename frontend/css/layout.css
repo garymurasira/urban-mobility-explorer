@@ -21,3 +21,33 @@
   margin: 0;
   font-size: 0.95rem;
 }
+
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.card__title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.status-text {
+  display: none;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin: 0 0 14px;
+}
+
+.status-text.is-visible {
+  display: block;
+}
+
+.status-text.is-error {
+  color: #B3261E;
+}

@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/filters.css">
   <link rel="stylesheet" href="css/kpi.css">
+  <link rel="stylesheet" href="css/trends.css">
+  <link rel="stylesheet" href="css/zones.css">
+  <link rel="stylesheet" href="css/insights.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -99,11 +104,134 @@
 
       <div class="kpi-grid" id="kpi-grid"></div>
     </section>
+
+    <section id="trends" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Trends</h2>
+        <p class="section__subtitle">Trip demand by hour of day across the full month.</p>
+      </div>
+      <div class="trends-grid">
+        <div class="card chart-card">
+          <h3 class="card__title">Trips by hour of day</h3>
+          <p class="status-text" id="trends-status"></p>
+          <canvas id="hourly-chart" height="100"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="zones" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Zones</h2>
+        <p class="section__subtitle">Busiest pickup zones across the city.</p>
+      </div>
+      <p class="status-text" id="zones-status"></p>
+      <div class="zones-grid">
+        <div class="card">
+          <h3 class="card__title">Pickup density map</h3>
+          <div id="zones-map"></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title">Top 7 zones by trip count</h3>
+          <canvas id="zones-chart" height="220"></canvas>
+        </div>
+      </div>
+      <div class="card zones-table-card">
+        <h3 class="card__title">All zones</h3>
+        <table class="zone-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-sort-key="zone">Zone</th>
+              <th data-sort-key="borough">Borough</th>
+              <th data-sort-key="trip_count">Trips</th>
+            </tr>
+          </thead>
+          <tbody id="zones-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="insights" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Insights</h2>
+        <p class="section__subtitle">What the data says about how the city moves.</p>
+      </div>
+      <p class="status-text" id="insights-status"></p>
+      <div class="insights-grid" id="insights-grid"></div>
+    </section>
   </main>
 
+  <footer class="footer">
+    <div class="footer__top">
+      <div>
+        <p class="footer__brand">
+          <span class="footer__brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14l1.4-4.2a2 2 0 0 0-1.9-2.8H5.5a2 2 0 0 0-1.9 2.8L5 17Z"/>
+              <path d="M5 17v2"/>
+              <path d="M19 17v2"/>
+              <path d="M7 10l1-3.5A1.5 1.5 0 0 1 9.4 5.5h5.2A1.5 1.5 0 0 1 16 6.5L17 10"/>
+              <circle cx="7.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="16.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          Urban Mobility Explorer
+        </p>
+        <p class="footer__tagline">
+          An interactive look at NYC yellow taxi trips &mdash; where, when, and at what cost the city moves.
+        </p>
+      </div>
+
+      <div>
+        <p class="footer__heading">Explore</p>
+        <ul class="footer__list">
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#trends">Trends</a></li>
+          <li><a href="#zones">Zones</a></li>
+          <li><a href="#insights">Insights</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="footer__heading">Resources</p>
+        <ul class="footer__list">
+          <li><a href="https://github.com/garymurasira/urban-mobility-explorer" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" target="_blank" rel="noopener">TLC trip record data</a></li>
+          <li><a href="https://github.com/garymurasira/urban-mobility-explorer/tree/main/docs" target="_blank" rel="noopener">Project documentation</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="footer__heading">Team</p>
+        <ul class="footer__list">
+          <li><span><strong>Gary</strong> &mdash; Lead, Architecture &amp; Database</span></li>
+          <li><span><strong>Espoir</strong> &mdash; Data Cleaning &amp; Features</span></li>
+          <li><span><strong>David</strong> &mdash; Backend API &amp; Algorithm</span></li>
+          <li><span><strong>Merci</strong> &mdash; Frontend &amp; Insights</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="footer__bottom-inner">
+        <p>&copy; 2026 Urban Mobility Explorer &middot; ALU Full-Stack Summative</p>
+        <span class="footer__badge">
+          <span class="footer__badge-dot" aria-hidden="true"></span>
+          Built with Chart.js &amp; Leaflet
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/navbar.js"></script>
+  <script src="js/status.js"></script>
   <script src="js/api.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/kpi.js"></script>
+  <script src="js/trends.js"></script>
+  <script src="js/zones.js"></script>
+  <script src="js/insights.js"></script>
 </body>
 </html>

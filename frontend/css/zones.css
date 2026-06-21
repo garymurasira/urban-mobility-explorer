@@ -1,0 +1,58 @@
+.zones-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+}
+
+.zones-table-card {
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .zones-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+#zones-map {
+  height: 360px;
+  border-radius: var(--radius-md);
+  z-index: 1;
+}
+
+.zone-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.zone-table th {
+  text-align: left;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.zone-table th:hover {
+  color: var(--color-text);
+}
+
+.zone-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.zone-table tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.zone-table__rank {
+  color: var(--color-yellow-dark);
+  font-weight: 700;
+  width: 28px;
+}

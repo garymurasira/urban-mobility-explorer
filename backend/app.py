@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from routes.insights import insights_bp
 from flask_cors import CORS
 
 from db import get_connection
@@ -16,6 +17,7 @@ def create_app():
     app.register_blueprint(stats_bp) 
     app.register_blueprint(trips_bp)  
     app.register_blueprint(zones_bp)
+    app.register_blueprint(insights_bp)
 
     @app.route("/api/health")
     def health():

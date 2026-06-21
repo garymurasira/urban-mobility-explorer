@@ -13,4 +13,15 @@ data/processed/
 # OS
 .DS_Store
 
+./database/.env
 data/taxi_zone_lookup.csv
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Environment files — never commit credentials
+.env
+**/.env

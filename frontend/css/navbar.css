@@ -36,10 +36,14 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 9px;
-  background: var(--color-yellow);
-  color: var(--color-text);
   flex-shrink: 0;
+}
+
+.navbar__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .navbar__title {

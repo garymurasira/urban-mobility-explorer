@@ -33,3 +33,26 @@
   line-height: 1.5;
   margin: 0;
 }
+
+.callout {
+  margin-top: 28px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #FFFBEB 0%, var(--color-surface) 100%);
+  border: 1px solid var(--color-border);
+}
+
+.callout__title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.callout__body {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 760px;
+}

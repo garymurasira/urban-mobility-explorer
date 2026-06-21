@@ -1,15 +1,42 @@
 (function () {
   const grid = document.getElementById("hourly-heatmap");
+  const legend = document.getElementById("hourly-heatmap-legend");
   const statusEl = document.getElementById("trends-status");
   if (!grid) return;
 
   const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const HOUR_LABELS = [0, 3, 6, 9, 12, 15, 18, 21];
 
+  // Three-stop scale (cream -> gold -> deep amber) interpolated on a
+  // sqrt-scaled value, so mid-range demand stays visually distinct instead
+  // of everything below the single busiest cell looking nearly identical.
+  const SCALE_STOPS = [
+    [255, 251, 235],
+    [245, 197, 24],
+    [180, 83, 9],
+  ];
+
+  function lerp(a, b, t) {
+    return Math.round(a + (b - a) * t);
+  }
+
+  function colorAt(t) {
+    t = Math.max(0, Math.min(1, t));
+    const segment = t < 0.5 ? 0 : 1;
+    const localT = t < 0.5 ? t / 0.5 : (t - 0.5) / 0.5;
+    const from = SCALE_STOPS[segment];
+    const to = SCALE_STOPS[segment + 1];
+    const rgb = [
+      lerp(from[0], to[0], localT),
+      lerp(from[1], to[1], localT),
+      lerp(from[2], to[2], localT),
+    ];
+    return "rgb(" + rgb.join(",") + ")";
+  }
+
   function colorFor(value, max) {
-    if (max === 0) return "rgba(245, 197, 24, 0.06)";
-    const opacity = 0.08 + (value / max) * 0.85;
-    return "rgba(245, 197, 24, " + opacity.toFixed(2) + ")";
+    if (max === 0) return colorAt(0);
+    return colorAt(Math.sqrt(value / max));
   }
 
   function render(cells) {
@@ -52,6 +79,21 @@
     }).join("");
 
     grid.innerHTML = hourHeader + rows;
+    renderLegend();
+  }
+
+  function renderLegend() {
+    if (!legend || legend.dataset.rendered) return;
+    const swatches = [0, 0.25, 0.5, 0.75, 1]
+      .map(function (t) {
+        return '<span class="heatmap-legend__swatch" style="background:' + colorAt(t) + '"></span>';
+      })
+      .join("");
+    legend.innerHTML =
+      '<span class="heatmap-legend__label">Fewer trips</span>' +
+      swatches +
+      '<span class="heatmap-legend__label">More trips</span>';
+    legend.dataset.rendered = "true";
   }
 
   function load(filters) {

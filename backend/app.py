@@ -4,12 +4,18 @@ from flask_cors import CORS
 from db import get_connection
 from routes.stats import stats_bp
 
+from routes.trips import trips_bp 
+from routes.zones import zones_bp
+
+
 
 def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    app.register_blueprint(stats_bp)
+    app.register_blueprint(stats_bp) 
+    app.register_blueprint(trips_bp)  
+    app.register_blueprint(zones_bp)
 
     @app.route("/api/health")
     def health():

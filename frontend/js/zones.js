@@ -111,16 +111,38 @@
   }
 
   function bindSortHeaders() {
-    document.querySelectorAll("[data-sort-key]").forEach(function (th) {
+    const headers = document.querySelectorAll("[data-sort-key]");
+
+    function activate(th) {
+      const key = th.getAttribute("data-sort-key");
+      if (sortKey === key) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+      } else {
+        sortKey = key;
+        sortDir = "desc";
+      }
+
+      headers.forEach(function (h) {
+        h.setAttribute(
+          "aria-sort",
+          h.getAttribute("data-sort-key") === sortKey
+            ? (sortDir === "asc" ? "ascending" : "descending")
+            : "none"
+        );
+      });
+
+      renderTable();
+    }
+
+    headers.forEach(function (th) {
       th.addEventListener("click", function () {
-        const key = th.getAttribute("data-sort-key");
-        if (sortKey === key) {
-          sortDir = sortDir === "asc" ? "desc" : "asc";
-        } else {
-          sortKey = key;
-          sortDir = "desc";
+        activate(th);
+      });
+      th.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          activate(th);
         }
-        renderTable();
       });
     });
   }

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>Urban Mobility Explorer &middot; NYC Yellow Taxi, Jan 2019</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,7 +66,7 @@
         </span>
         <h1 class="hero__title">Where and when does New York City move?</h1>
         <p class="hero__subtitle">
-          1.9M+ cleaned trips, mapped across boroughs, hours, and fares. Filter the data below to explore patterns in urban mobility.
+          7.4M+ cleaned trips, mapped across boroughs, hours, and fares. Filter the data below to explore patterns in urban mobility.
         </p>
       </div>
     </div>
@@ -109,13 +110,13 @@
     <section id="trends" class="section">
       <div class="section__header">
         <h2 class="section__title">Trends</h2>
-        <p class="section__subtitle">Trip demand by hour of day across the full month.</p>
+        <p class="section__subtitle">Trip demand by hour of day and day of week across the full month.</p>
       </div>
       <div class="trends-grid">
         <div class="card chart-card">
-          <h3 class="card__title">Trips by hour of day</h3>
+          <h3 class="card__title">Trips by hour and day of week</h3>
           <p class="status-text" id="trends-status"></p>
-          <canvas id="hourly-chart" height="100"></canvas>
+          <div class="heatmap" id="hourly-heatmap" role="img" aria-label="Heatmap of trip demand by hour of day and day of week"></div>
         </div>
       </div>
     </section>
@@ -138,17 +139,19 @@
       </div>
       <div class="card zones-table-card">
         <h3 class="card__title">All zones</h3>
-        <table class="zone-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-sort-key="zone">Zone</th>
-              <th data-sort-key="borough">Borough</th>
-              <th data-sort-key="trip_count">Trips</th>
-            </tr>
-          </thead>
-          <tbody id="zones-table-body"></tbody>
-        </table>
+        <div class="zone-table-wrapper">
+          <table class="zone-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th data-sort-key="zone" tabindex="0" role="button" aria-sort="none">Zone</th>
+                <th data-sort-key="borough" tabindex="0" role="button" aria-sort="none">Borough</th>
+                <th data-sort-key="trip_count" tabindex="0" role="button" aria-sort="descending">Trips</th>
+              </tr>
+            </thead>
+            <tbody id="zones-table-body"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 

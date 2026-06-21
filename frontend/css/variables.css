@@ -4,6 +4,9 @@
   --color-surface: #FAFAFA;
   --color-yellow: #F5C518;
   --color-yellow-dark: #D9A900;
+  /* Yellow fails WCAG text contrast on white (~2.2:1). Use this instead
+     for any actual text — passes 4.5:1 while still reading as "amber". */
+  --color-amber-text: #8A6D00;
   --color-text: #1A1A1A;
   --color-text-muted: #5C5C5C;
   --color-border: #ECECEC;
@@ -19,6 +22,10 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {

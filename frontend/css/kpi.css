@@ -4,6 +4,21 @@
   gap: 16px;
 }
 
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .kpi-card {
+    padding: 14px;
+  }
+
+  .kpi-card__value {
+    font-size: 1.3rem;
+  }
+}
+
 .kpi-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -26,7 +41,7 @@
   height: 32px;
   border-radius: 8px;
   background: var(--color-surface);
-  color: var(--color-yellow-dark);
+  color: var(--color-amber-text);
   margin-bottom: 10px;
 }
 

@@ -6,21 +6,41 @@ const API = (function () {
   const MOCK_MODE = true;
   const BASE_URL = "http://localhost:5000/api";
 
+  // Figures grounded in Espoir's cleaned dataset (7,485,597 trips total;
+  // see docs/report_problem_framing_espoir.md) and the 1,000-row cleaned
+  // sample (data/sample/trips_clean_sample.csv) for the per-trip averages.
   const MOCK_SUMMARY = {
-    total_trips: 1923841,
-    avg_fare: 12.45,
-    avg_distance_mi: 2.9,
-    avg_duration_min: 14.2,
-    pct_cross_borough: 18.6,
+    total_trips: 7485597,
+    avg_fare: 12.43,
+    avg_distance_mi: 2.86,
+    avg_duration_min: 14.47,
+    pct_cross_borough: 10.71,
   };
 
-  // Trip counts by hour-of-day, shaped like the morning/evening commute peaks.
-  const MOCK_HOURLY = [
+  // Hour-of-day shapes for a weekday (commute peaks) vs a weekend (flatter,
+  // later peak), used to synthesize a plausible day_of_week x hour grid.
+  // day_of_week follows pandas .dt.dayofweek: 0=Mon .. 6=Sun.
+  const WEEKDAY_HOURLY = [
     18, 11, 7, 5, 6, 14, 38, 72, 95, 70, 58, 62, 68, 64, 60, 66, 78, 98, 100,
     82, 60, 45, 33, 24,
-  ].map(function (count, hour) {
-    return { hour: hour, trip_count: count * 1000 };
-  });
+  ];
+  const WEEKEND_HOURLY = [
+    25, 18, 12, 8, 6, 5, 8, 15, 25, 40, 55, 68, 75, 80, 82, 85, 88, 90, 88,
+    80, 65, 50, 38, 28,
+  ];
+
+  const MOCK_HEATMAP = [];
+  for (let day = 0; day < 7; day++) {
+    const pattern = day < 5 ? WEEKDAY_HOURLY : WEEKEND_HOURLY;
+    const dayFactor = day < 5 ? 1 : 0.8;
+    pattern.forEach(function (count, hour) {
+      MOCK_HEATMAP.push({
+        day_of_week: day,
+        hour: hour,
+        trip_count: Math.round(count * 1000 * dayFactor),
+      });
+    });
+  }
 
   const MOCK_TOP_ZONES = [
     { zone: "Midtown Center", borough: "Manhattan", trip_count: 184320, lat: 40.7549, lon: -73.984 },
@@ -32,29 +52,34 @@ const API = (function () {
     { zone: "Park Slope", borough: "Brooklyn", trip_count: 64210, lat: 40.6710, lon: -73.9814 },
   ];
 
+  // Computed from data/sample/trips_clean_sample.csv (1,000-row cleaned
+  // sample) joined to zones_reference.csv. Re-derive from the full 7.48M
+  // row table once the live DB/API is connected — these are directional,
+  // not final, figures.
   const MOCK_INSIGHTS = [
     {
-      title: "Manhattan dominates demand",
-      stat: "78%",
+      title: "Manhattan dominates pickup demand",
+      stat: "90.5%",
       body:
-        "78% of all pickups originate in Manhattan, even though it holds " +
-        "only a third of the zone count — demand is heavily concentrated " +
-        "in a small footprint of the city.",
+        "90.5% of sampled pickups originate in Manhattan, versus 6.2% in " +
+        "Queens and just over 1% in Brooklyn — demand is heavily " +
+        "concentrated in a small footprint of the city.",
     },
     {
-      title: "Evening rush outprices the morning",
-      stat: "+22%",
+      title: "Most trips stay within one borough",
+      stat: "11.8%",
       body:
-        "Average fares between 5-7pm run about 22% higher than the 8-9am " +
-        "morning peak, despite similar trip volumes — likely a mix of " +
-        "longer evening trips and congestion surcharges.",
+        "Only 11.8% of sampled trips cross a borough line (full-dataset " +
+        "figure: 10.71%, per the cleaning report) — the large majority of " +
+        "demand is short, local movement rather than cross-borough travel.",
     },
     {
-      title: "Airport trips are the outliers",
-      stat: "2.4x",
+      title: "Night trips cost more than any other time of day",
+      stat: "+23%",
       body:
-        "Trips to/from JFK and LaGuardia average 2.4x the fare of a typical " +
-        "in-borough trip and skew the city-wide average distance upward.",
+        "Night trips average $14.75 versus $11.96 for the rest of the day " +
+        "— about 23% higher — consistent with the TLC's mandated overnight " +
+        "surcharge (8pm-6am), not just lighter traffic.",
     },
   ];
 
@@ -133,6 +158,8 @@ const API = (function () {
       });
   }
 
+  // Returns a flat array of { day_of_week, hour, trip_count } — one entry
+  // per (day, hour) cell — for the Trends heatmap.
   function fetchHourly(filters) {
     if (MOCK_MODE) {
       filters = filters || {};
@@ -141,16 +168,16 @@ const API = (function () {
       const scale = dayFraction * boroughShare;
 
       return Promise.resolve(
-        MOCK_HOURLY.map(function (row) {
-          return { hour: row.hour, trip_count: Math.round(row.trip_count * scale) };
+        MOCK_HEATMAP.map(function (row) {
+          return {
+            day_of_week: row.day_of_week,
+            hour: row.hour,
+            trip_count: Math.round(row.trip_count * scale),
+          };
         })
       );
     }
 
-    // Backend returns one row per (day_of_week, pickup_hour) pair — richer
-    // than the simple hour-of-day chart we render today. Collapse it down
-    // for now; a real day x hour heatmap can read this same response shape
-    // directly later (see frontend/js/trends.js).
     const params = new URLSearchParams(filters || {});
     return fetch(BASE_URL + "/stats/hourly?" + params.toString())
       .then(function (res) {
@@ -158,12 +185,12 @@ const API = (function () {
         return res.json();
       })
       .then(function (rows) {
-        const totals = new Array(24).fill(0);
-        rows.forEach(function (row) {
-          totals[row.pickup_hour] += row.trip_count;
-        });
-        return totals.map(function (trip_count, hour) {
-          return { hour: hour, trip_count: trip_count };
+        return rows.map(function (row) {
+          return {
+            day_of_week: row.day_of_week,
+            hour: row.pickup_hour,
+            trip_count: row.trip_count,
+          };
         });
       });
   }

@@ -52,7 +52,15 @@
 }
 
 .zone-table__rank {
-  color: var(--color-yellow-dark);
+  color: var(--color-amber-text);
   font-weight: 700;
   width: 28px;
+}
+
+.zone-table-wrapper {
+  overflow-x: auto;
+}
+
+.zone-table th[data-sort-key] {
+  outline-offset: 2px;
 }

@@ -45,6 +45,20 @@ No build step or install required — it's static HTML/CSS/JS.
    unreachable, the page still renders with system-font fallbacks; only
    the hourly chart and the zone map will be missing.
 
+### Deploying the frontend (optional bonus)
+
+A `netlify.toml` is already in the repo root, configured to publish the
+`frontend/` folder as a static site with no build step. To go live:
+
+1. Go to [app.netlify.com](https://app.netlify.com) and sign in (free tier
+   is enough).
+2. "Add new site" → "Import an existing project" → connect this GitHub repo.
+3. Netlify reads `netlify.toml` automatically — base directory `frontend`,
+   no build command, publish directory `frontend`. Just click "Deploy".
+4. Add the live URL to this README once it's up.
+
+> Live URL: TODO
+
 ## Video walkthrough
 
 > TODO: add the link once recorded.

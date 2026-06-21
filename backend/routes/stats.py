@@ -21,3 +21,17 @@ def summary():
     """
     result = run_query(sql)
     return jsonify(result[0] if result else {})
+
+@stats_bp.route("/api/stats/hourly", methods=["GET"])
+def hourly_stats():
+    rows = run_query("""
+        SELECT day_of_week, pickup_hour,
+               COUNT(*) AS trip_count,
+               AVG(fare_amount) AS avg_fare,
+               AVG(trip_distance) AS avg_distance
+        FROM trips
+        WHERE pickup_hour IS NOT NULL AND day_of_week IS NOT NULL
+        GROUP BY day_of_week, pickup_hour
+        ORDER BY day_of_week, pickup_hour
+    """)
+    return jsonify(rows)

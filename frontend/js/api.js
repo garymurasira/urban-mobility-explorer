@@ -70,6 +70,17 @@ const API = (function () {
 
   const PAYMENT_FARE_FACTOR = { card: 1.05, cash: 0.85, other: 0.95 };
 
+  // NYC TLC's standard payment_type_id codes (data dictionary), used to
+  // label David's /api/insights tips_by_payment rows for display.
+  const PAYMENT_TYPE_LABELS = {
+    1: "Credit card",
+    2: "Cash",
+    3: "No charge",
+    4: "Dispute",
+    5: "Unknown",
+    6: "Voided trip",
+  };
+
   function daysInRange(filters) {
     if (!filters.date_from && !filters.date_to) return 31;
     const from = filters.date_from ? new Date(filters.date_from) : new Date("2019-01-01");
@@ -103,13 +114,23 @@ const API = (function () {
       });
     }
 
+    // NOTE: backend ignores filters today (no WHERE clause in
+    // stats.py:summary) and has no pct_cross_borough — flagged to David.
     const params = new URLSearchParams(filters || {});
-    return fetch(BASE_URL + "/stats/summary?" + params.toString()).then(
-      function (res) {
+    return fetch(BASE_URL + "/stats/summary?" + params.toString())
+      .then(function (res) {
         if (!res.ok) throw new Error("Failed to fetch summary");
         return res.json();
-      }
-    );
+      })
+      .then(function (row) {
+        return {
+          total_trips: row.total_trips,
+          avg_fare: row.avg_fare,
+          avg_distance_mi: row.avg_trip_distance,
+          avg_duration_min: row.avg_duration_min,
+          pct_cross_borough: row.pct_cross_borough,
+        };
+      });
   }
 
   function fetchHourly(filters) {
@@ -126,13 +147,25 @@ const API = (function () {
       );
     }
 
+    // Backend returns one row per (day_of_week, pickup_hour) pair — richer
+    // than the simple hour-of-day chart we render today. Collapse it down
+    // for now; a real day x hour heatmap can read this same response shape
+    // directly later (see frontend/js/trends.js).
     const params = new URLSearchParams(filters || {});
-    return fetch(BASE_URL + "/stats/hourly?" + params.toString()).then(
-      function (res) {
+    return fetch(BASE_URL + "/stats/hourly?" + params.toString())
+      .then(function (res) {
         if (!res.ok) throw new Error("Failed to fetch hourly stats");
         return res.json();
-      }
-    );
+      })
+      .then(function (rows) {
+        const totals = new Array(24).fill(0);
+        rows.forEach(function (row) {
+          totals[row.pickup_hour] += row.trip_count;
+        });
+        return totals.map(function (trip_count, hour) {
+          return { hour: hour, trip_count: trip_count };
+        });
+      });
   }
 
   function fetchTopZones(filters) {
@@ -148,13 +181,63 @@ const API = (function () {
       return Promise.resolve(zones);
     }
 
+    // Backend wraps results in {direction, limit, results}, not a bare
+    // array, and doesn't include lat/lon yet — flagged to David.
     const params = new URLSearchParams(filters || {});
-    return fetch(BASE_URL + "/zones/top?" + params.toString()).then(
-      function (res) {
+    return fetch(BASE_URL + "/zones/top?" + params.toString())
+      .then(function (res) {
         if (!res.ok) throw new Error("Failed to fetch top zones");
         return res.json();
-      }
-    );
+      })
+      .then(function (payload) {
+        return payload.results || [];
+      });
+  }
+
+  // David's /api/insights returns raw aggregates, not display copy — we
+  // write the interpretive text ourselves so we control the storytelling.
+  function buildInsightCards(raw) {
+    const cards = [];
+
+    if (raw.peak_hour) {
+      cards.push({
+        title: "Demand peaks at a single hour",
+        stat: raw.peak_hour.pickup_hour + ":00",
+        body:
+          "The busiest pickup hour citywide is " + raw.peak_hour.pickup_hour +
+          ":00, with " + Number(raw.peak_hour.trip_count).toLocaleString("en-US") +
+          " trips recorded in that hour alone across the month.",
+      });
+    }
+
+    if (raw.cross_borough && raw.cross_borough.total_trips) {
+      const pct = round(
+        (raw.cross_borough.cross_trips / raw.cross_borough.total_trips) * 100,
+        1
+      );
+      cards.push({
+        title: "Most trips stay within one borough",
+        stat: pct + "%",
+        body:
+          "Only " + pct + "% of trips cross a borough line — the rest start " +
+          "and end in the same borough, suggesting most demand is local " +
+          "rather than cross-city.",
+      });
+    }
+
+    if (raw.tips_by_payment && raw.tips_by_payment.length) {
+      const top = raw.tips_by_payment[0];
+      const label = PAYMENT_TYPE_LABELS[top.payment_type_id] || "this payment type";
+      cards.push({
+        title: "Tipping behavior varies by payment method",
+        stat: round(top.avg_tip_pct * 100, 1) + "%",
+        body:
+          label + " trips have the highest average tip percentage, at " +
+          round(top.avg_tip_pct * 100, 1) + "% of the fare.",
+      });
+    }
+
+    return cards;
   }
 
   function fetchInsights(filters) {
@@ -163,11 +246,39 @@ const API = (function () {
     }
 
     const params = new URLSearchParams(filters || {});
-    return fetch(BASE_URL + "/insights?" + params.toString()).then(function (res) {
-      if (!res.ok) throw new Error("Failed to fetch insights");
+    return fetch(BASE_URL + "/insights?" + params.toString())
+      .then(function (res) {
+        if (!res.ok) throw new Error("Failed to fetch insights");
+        return res.json();
+      })
+      .then(buildInsightCards);
+  }
+
+  // /api/trips exists on the backend (paginated, sortable trip rows) but
+  // nothing in the dashboard calls it yet. Added for when we build a raw
+  // trips table/drill-down view. NOTE: its filter params use different
+  // names/types than the filter bar (start_date/end_date, payment_type as
+  // an integer id) — pass backend-shaped params, not filter-bar filters,
+  // until that's standardized.
+  function fetchTrips(backendParams) {
+    if (MOCK_MODE) {
+      return Promise.resolve({
+        page: 1,
+        page_size: 25,
+        total: 0,
+        total_pages: 0,
+        sort_by: "pickup_datetime",
+        order: "desc",
+        data: [],
+      });
+    }
+
+    const params = new URLSearchParams(backendParams || {});
+    return fetch(BASE_URL + "/trips?" + params.toString()).then(function (res) {
+      if (!res.ok) throw new Error("Failed to fetch trips");
       return res.json();
     });
   }
 
-  return { fetchSummary, fetchHourly, fetchTopZones, fetchInsights };
+  return { fetchSummary, fetchHourly, fetchTopZones, fetchInsights, fetchTrips };
 })();

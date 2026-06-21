@@ -25,9 +25,18 @@
   function renderMarkers(zones) {
     if (!map) return;
     markersLayer.clearLayers();
-    const maxTrips = Math.max.apply(null, zones.map(function (z) { return z.trip_count; }));
 
-    zones.forEach(function (zone) {
+    // David's /api/zones/top doesn't include lat/lon yet (flagged to him).
+    // Skip plotting any zone we don't have coordinates for instead of
+    // letting Leaflet throw on an invalid LatLng.
+    const plottable = zones.filter(function (z) {
+      return typeof z.lat === "number" && typeof z.lon === "number";
+    });
+    if (plottable.length === 0) return;
+
+    const maxTrips = Math.max.apply(null, plottable.map(function (z) { return z.trip_count; }));
+
+    plottable.forEach(function (zone) {
       const radius = 6 + (zone.trip_count / maxTrips) * 18;
       L.circleMarker([zone.lat, zone.lon], {
         radius: radius,

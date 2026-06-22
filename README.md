@@ -36,10 +36,11 @@ No build step or install required — it's static HTML/CSS/JS.
    python3 -m http.server 8000
    ```
    Then visit `http://localhost:8000`.
-2. The dashboard currently runs against **mock data** (see
-   `frontend/js/api.js`, `MOCK_MODE`). Once the backend is running, set
-   `MOCK_MODE = false` and point `BASE_URL` at the live API to switch to
-   real data — no other frontend files need to change.
+2. The dashboard calls the live backend directly (see `frontend/js/api.js`).
+   It expects the Flask API at `BASE_URL` (`http://localhost:5000/api` by
+   default) — update that constant if the backend runs elsewhere. With no
+   backend reachable, each section will show its "Could not load…" error
+   state rather than silently showing stale/fake numbers.
 3. Requires internet access on first load for the Google Fonts, Chart.js,
    and Leaflet CDN assets (and Leaflet's map tiles). If those CDNs are
    unreachable, the page still renders with system-font fallbacks; only

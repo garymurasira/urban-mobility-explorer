@@ -5,9 +5,9 @@
 
   function render(insights) {
     grid.innerHTML = insights
-      .map(function (insight) {
+      .map(function (insight, index) {
         return (
-          '<div class="insight-card">' +
+          '<div class="insight-card" style="animation-delay:' + index * 90 + 'ms">' +
           '<p class="insight-card__stat">' + insight.stat + "</p>" +
           '<h3 class="insight-card__title">' + insight.title + "</h3>" +
           '<p class="insight-card__body">' + insight.body + "</p>" +

@@ -16,13 +16,17 @@ def top_zones():
     rows = run_query(f"SELECT {column} AS zone_id FROM trips")
     ranked = top_n_by_count(((r["zone_id"], 1) for r in rows), limit)
 
-    zone_rows = run_query("SELECT location_id, borough, zone FROM zones")
+    zone_rows = run_query(
+        "SELECT location_id, borough, zone, centroid_lat, centroid_lon FROM zones"
+    )
     lookup = {z["location_id"]: z for z in zone_rows}
 
     results = [{
         "location_id": zid,
         "borough": lookup.get(zid, {}).get("borough"),
         "zone": lookup.get(zid, {}).get("zone"),
+        "lat": lookup.get(zid, {}).get("centroid_lat"),
+        "lon": lookup.get(zid, {}).get("centroid_lon"),
         "trip_count": count,
     } for zid, count in ranked]
 

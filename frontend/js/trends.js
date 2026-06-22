@@ -121,6 +121,8 @@
             backgroundColor: "#F5C518",
             borderRadius: 4,
             maxBarThickness: 22,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
           },
         ],
       },

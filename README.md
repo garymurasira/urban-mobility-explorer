@@ -227,9 +227,9 @@ Available in [`docs/`](docs/):
 - [`docs/ai-usage-log.md`](docs/ai-usage-log.md) — per-person record of AI tool usage, required
   for the Individual Effort Verification multiplier
 
-### Pending before submission (not yet in the repo)
+### Pending before submission (Uploaded)
 
-- **Assembled PDF report** — the full 2–3 page report combining all team sections (architecture
+- **Assembled PDF report** — the full pages report combining all team sections (architecture
   & design writeup, algorithm/complexity writeup, plus the two sections above)
 
 ---

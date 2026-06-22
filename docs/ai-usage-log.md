@@ -1,7 +1,50 @@
-# AI Usage Log — David (Backend API & Algorithm)
+# AI Usage Log
 
-**Project:** Urban Mobility Explorer  
-**Role:** Backend API & Custom Algorithm  
+Each person records what they used AI assistance for and how they verified
+or changed the output, per the project brief's Individual Effort
+Verification requirement.
+
+---
+
+## Merci (Frontend)
+
+**What I used AI for:**
+- Researching how to implement Chart.js (bar charts for the zones
+  comparison, configuring scales/legends) and Leaflet (map initialization,
+  markers, popups) since I hadn't used either library before.
+- Researching approaches for more complex JavaScript concepts I wasn't
+  confident with yet — e.g. how an event-driven filter pattern (a single
+  custom event that multiple sections can listen to independently) is
+  typically structured, and how to shape a mock data layer so it mirrors
+  a real API's expected response format.
+- Getting debugging help to understand issues I couldn't diagnose on my
+  own, including:
+  - Why the Trends heatmap's day rows rendered misaligned on narrow
+    screens — learned it was a CSS Grid auto-placement pitfall (mixing
+    explicit `grid-row` placement with auto-placed items), which I didn't
+    know about beforehand.
+  - Why a real mobile screenshot showed an unexpected blue/orange color
+    tint — learned it was the browser's forced-dark-mode color inversion
+    rather than a CSS bug, and that declaring `color-scheme: light` was
+    the standard fix.
+
+**How I verified/changed the output:**
+- Tested every change myself in an actual browser (including real mobile
+  screenshots at narrow viewport widths) rather than assuming a suggested
+  fix worked — the heatmap misalignment bug above was only caught this way.
+- Manually computed WCAG contrast ratios for the yellow accent color used
+  as text and confirmed it failed the 4.5:1 minimum before changing it,
+  rather than taking a color suggestion at face value.
+- Cross-checked all "insight" figures shown on the dashboard against the
+  actual cleaned sample dataset (`data/sample/trips_clean_sample.csv`) and
+  Espoir's cleaning report — caught and corrected an earlier set of
+  placeholder numbers that turned out to be inconsistent with the real
+  data (e.g. a "1.9M trips" figure that didn't match the actual 7,485,597
+  cleaned count).
+
+---
+
+## David (Backend API & Algorithm)
 
 ---
 
@@ -43,5 +86,9 @@
 
 ---
 
+*All AI suggestions were reviewed, tested, and verified before being trusted.*
 
-*All AI suggestions were reviewed, tested,*
+---
+
+> TODO (Gary, Espoir): add your own entries above, following the same
+> format — what you used AI for, and how you verified or changed it.

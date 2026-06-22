@@ -99,7 +99,7 @@
     tableBody.innerHTML = sorted
       .map(function (zone, index) {
         return (
-          "<tr>" +
+          '<tr style="animation-delay:' + Math.min(index * 30, 300) + 'ms">' +
           '<td class="zone-table__rank">' + (index + 1) + "</td>" +
           "<td>" + zone.zone + "</td>" +
           "<td>" + zone.borough + "</td>" +

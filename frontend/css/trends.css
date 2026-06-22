@@ -66,11 +66,23 @@
   z-index: 1;
 }
 
+@keyframes heatmap-cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .heatmap__cell {
   border-radius: 4px;
   min-width: 14px;
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+  animation: heatmap-cell-in 0.3s ease both;
 }
 
 .heatmap__cell:hover {
@@ -80,8 +92,31 @@
   z-index: 2;
 }
 
-@media (max-width: 700px) {
+@media (prefers-reduced-motion: reduce) {
+  .heatmap__cell {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) and (min-width: 601px) {
   .heatmap {
     grid-template-columns: 36px repeat(24, 18px);
+  }
+}
+
+.heatmap--mobile {
+  display: none;
+}
+
+/* Below 600px the 24x7 heatmap needs horizontal scrolling to read, which
+   is awkward on a phone — show a simpler hour-of-day bar chart instead. */
+@media (max-width: 600px) {
+  .heatmap--desktop,
+  .heatmap-legend {
+    display: none;
+  }
+
+  .heatmap--mobile {
+    display: block;
   }
 }

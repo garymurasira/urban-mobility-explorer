@@ -56,17 +56,49 @@
   }
 
   function renderSummary(summary) {
-    grid.innerHTML = CARDS.map(function (card) {
+    grid.innerHTML = CARDS.map(function (card, index) {
       const value = summary[card.key];
-      const display = value === undefined ? "&ndash;" : card.format(value);
+      const display = value === undefined ? "&ndash;" : card.format(0);
       return (
-        '<div class="kpi-card">' +
+        '<div class="kpi-card" style="animation-delay:' + index * 60 + 'ms">' +
         '<div class="kpi-card__icon">' + icon(card.icon) + "</div>" +
         '<p class="kpi-card__label">' + card.label + "</p>" +
-        '<p class="kpi-card__value">' + display + "</p>" +
+        '<p class="kpi-card__value" data-key="' + card.key + '">' + display + "</p>" +
         "</div>"
       );
     }).join("");
+
+    CARDS.forEach(function (card) {
+      const value = summary[card.key];
+      if (value === undefined) return;
+      const el = grid.querySelector('[data-key="' + card.key + '"]');
+      animateValue(el, Number(value), card.format);
+    });
+  }
+
+  // Counts up from 0 to the target value over ~700ms (ease-out) instead of
+  // snapping the number in instantly — standard dashboard polish.
+  function animateValue(el, target, format) {
+    if (!el) return;
+
+    const prefersReducedMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      el.textContent = format(target);
+      return;
+    }
+
+    const duration = 700;
+    const start = performance.now();
+
+    function tick(now) {
+      const elapsed = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - elapsed, 3);
+      el.textContent = format(target * eased);
+      if (elapsed < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
   }
 
   function loadSummary(filters) {

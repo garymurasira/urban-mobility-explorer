@@ -14,6 +14,15 @@
   }
 }
 
+/* The sortable zone table below already lists every zone ranked by trip
+   count — on a phone, showing the chart too is redundant clutter, so hide
+   it and let the map take the full width. The chart stays for tablet/desktop. */
+@media (max-width: 600px) {
+  .zones-chart-card {
+    display: none;
+  }
+}
+
 #zones-map {
   height: 360px;
   border-radius: var(--radius-md);
@@ -49,6 +58,27 @@
 
 .zone-table tbody tr:hover {
   background: var(--color-surface);
+}
+
+@keyframes zone-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.zone-table tbody tr {
+  animation: zone-row-in 0.3s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone-table tbody tr {
+    animation: none;
+  }
 }
 
 .zone-table__rank {

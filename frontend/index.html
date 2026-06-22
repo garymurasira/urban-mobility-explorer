@@ -112,7 +112,8 @@
             <div class="heatmap-legend" id="hourly-heatmap-legend"></div>
           </div>
           <p class="status-text" id="trends-status"></p>
-          <div class="heatmap" id="hourly-heatmap" role="img" aria-label="Heatmap of trip demand by hour of day and day of week"></div>
+          <div class="heatmap heatmap--desktop" id="hourly-heatmap" role="img" aria-label="Heatmap of trip demand by hour of day and day of week"></div>
+          <canvas class="heatmap--mobile" id="hourly-mobile-chart" height="200"></canvas>
         </div>
       </div>
     </section>
@@ -128,7 +129,7 @@
           <h3 class="card__title">Pickup density map</h3>
           <div id="zones-map"></div>
         </div>
-        <div class="card">
+        <div class="card zones-chart-card">
           <h3 class="card__title">Top 7 zones by trip count</h3>
           <canvas id="zones-chart" height="220"></canvas>
         </div>

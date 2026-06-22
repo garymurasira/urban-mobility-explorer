@@ -1,8 +1,15 @@
 (function () {
+  const navbar = document.getElementById("navbar");
   const toggle = document.getElementById("navbar-toggle");
   const nav = document.getElementById("navbar-nav");
 
   if (!toggle || !nav) return;
+
+  function setScrolledState() {
+    if (navbar) navbar.classList.toggle("is-scrolled", window.scrollY > 8);
+  }
+  window.addEventListener("scroll", setScrolledState);
+  setScrolledState();
 
   toggle.addEventListener("click", function () {
     const isOpen = nav.classList.toggle("is-open");

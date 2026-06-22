@@ -1,8 +1,11 @@
 (function () {
   const grid = document.getElementById("hourly-heatmap");
   const legend = document.getElementById("hourly-heatmap-legend");
+  const mobileCanvas = document.getElementById("hourly-mobile-chart");
   const statusEl = document.getElementById("trends-status");
   if (!grid) return;
+
+  let mobileChart = null;
 
   const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const HOUR_LABELS = [0, 3, 6, 9, 12, 15, 18, 21];
@@ -69,9 +72,12 @@
       const cellsHtml = Array.from({ length: 24 }, function (_, hour) {
         const value = (byDay[dayIndex] && byDay[dayIndex][hour]) || 0;
         const title = label + " " + hour + ":00 — " + value.toLocaleString("en-US") + " trips";
+        // Diagonal stagger (day + hour) so the grid "paints in" as a wave
+        // sweeping from the top-left corner rather than popping all at once.
+        const delay = (dayIndex + hour) * 8;
         return (
           '<div class="heatmap__cell" style="grid-row:' + row + ";grid-column:" + (hour + 2) +
-          ";background:" + colorFor(value, max) + '" title="' + title + '"></div>'
+          ";background:" + colorFor(value, max) + ";animation-delay:" + delay + 'ms" title="' + title + '"></div>'
         );
       }).join("");
 
@@ -80,6 +86,53 @@
 
     grid.innerHTML = hourHeader + rows;
     renderLegend();
+    renderMobileChart(byDay);
+  }
+
+  // The 24 x 7 heatmap needs horizontal scrolling on phones. Below 600px
+  // we show this simpler total-trips-by-hour bar chart instead (CSS swaps
+  // which one is visible) — fewer data points, no scrolling, still useful.
+  function renderMobileChart(byDay) {
+    if (!mobileCanvas || typeof Chart === "undefined") return;
+
+    const totals = new Array(24).fill(0);
+    Object.keys(byDay).forEach(function (day) {
+      Object.keys(byDay[day]).forEach(function (hour) {
+        totals[hour] += byDay[day][hour];
+      });
+    });
+
+    const labels = totals.map(function (_, hour) { return hour + ":00"; });
+
+    if (mobileChart) {
+      mobileChart.data.datasets[0].data = totals;
+      mobileChart.update();
+      return;
+    }
+
+    mobileChart = new Chart(mobileCanvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Trips",
+            data: totals,
+            backgroundColor: "#F5C518",
+            borderRadius: 4,
+            maxBarThickness: 22,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+          y: { beginAtZero: true, ticks: { callback: function (v) { return v / 1000 + "k"; } } },
+        },
+      },
+    });
   }
 
   function renderLegend() {

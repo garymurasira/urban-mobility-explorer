@@ -155,7 +155,7 @@ The API base URL is **`http://localhost:5000/api`**. Key endpoints:
 | `GET /api/health` | Health check — confirms the API is up and can reach the database |
 | `GET /api/stats/summary` | Headline KPIs (total trips, avg fare/distance/duration, % cross-borough); supports `date_from`, `date_to`, `borough` filters |
 | `GET /api/stats/hourly` | Trip counts per (day-of-week × hour) for the Trends heatmap |
-| `GET /api/zones/top` | Top pickup zones by trip count |
+| `GET /api/zones/top` | Top pickup zones by trip count, including `lat`/`lon` centroids for the map |
 | `GET /api/insights` | Aggregates behind the Insights cards (peak hour, cross-borough share, tips by payment type) |
 | `GET /api/trips` | Paginated, sortable raw trip rows |
 
@@ -185,8 +185,14 @@ section shows its "could not load" error state rather than fake numbers. First l
 internet access for the Google Fonts, Chart.js, and Leaflet CDN assets (the page still
 renders with fallbacks if those are unreachable).
 
-**Dashboard sections:** Overview (filters + KPI cards) · Trends (demand heatmap) ·
-Zones (pickup map, top-zones chart, zone table) · Insights (data-backed findings).
+**Dashboard sections:** Overview (filters + KPI cards) · Trends (demand heatmap, hour ×
+day of week) · Zones (choropleth map of all 263 NYC taxi zones shaded by pickup volume,
+numbered pins for the top 7, top-zones chart, sortable zone table) · Insights (3
+data-backed findings + a "why this matters" callout).
+
+The Zones choropleth is built from the official TLC `taxi_zones` shapefile, reprojected
+from NAD83 NY State Plane to WGS84 and exported as
+[`frontend/assets/zones.geojson`](frontend/assets/zones.geojson) (263 polygons, ~3.9 MB).
 
 ---
 

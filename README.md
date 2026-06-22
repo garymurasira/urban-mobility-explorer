@@ -192,17 +192,20 @@ Zones (pickup map, top-zones chart, zone table) · Insights (data-backed finding
 
 ## Deployment (optional bonus)
 
-The backend ships a [`backend/Procfile`](backend/Procfile) (`web: gunicorn app:app`) so it
-can be deployed to a Procfile-based host such as Render. Set the same `DB_*` environment
-variables there, pointing at a hosted MySQL instance.
+**The app is deployed and live** — all three layers are hosted separately:
 
-The frontend is a static folder and can be served by any static host (e.g. Netlify) by
-publishing `frontend/`; remember to update `BASE_URL` in `frontend/js/api.js` to the live
-backend URL before deploying.
+| Layer | Host | Notes |
+|---|---|---|
+| Database | [FreeSQLDatabase](https://www.freesqldatabase.com/) | Free hosted MySQL; same schema as local, loaded via `database/load_data.py` |
+| Backend API | [Render](https://render.com) | Deployed via [`backend/Procfile`](backend/Procfile) (`web: gunicorn app:app`); `DB_*` env vars point at the FreeSQLDatabase instance above |
+| Frontend | [Vercel](https://vercel.com) | Static deploy of `frontend/`, Root Directory set to `frontend`, no build step |
 
-> **Live URLs (add once deployed):**
-> - Backend API: _TODO_
-> - Frontend dashboard: _TODO_
+`frontend/js/api.js`'s `BASE_URL` is already pointed at the live Render backend, so the
+deployed frontend talks to the deployed backend/database with no local setup needed.
+
+> **Live URLs:**
+> - Backend API: https://urban-mobility-explorer.onrender.com
+> - Frontend dashboard: https://urban-mobility-explorer.vercel.app/
 
 ---
 
@@ -213,17 +216,15 @@ Available in [`docs/`](docs/):
 - [`docs/architecture-diagram.png`](docs/architecture-diagram.png) — system architecture diagram
 - [`docs/report_problem_framing_espoir.md`](docs/report_problem_framing_espoir.md) — dataset
   analysis, cleaning decisions, and exclusion-log summary
+- [`docs/report_insights_interpretation_merci.md`](docs/report_insights_interpretation_merci.md) —
+  the 3 data-backed insights shown on the dashboard, with derivation and real-world interpretation
+- [`docs/ai-usage-log.md`](docs/ai-usage-log.md) — per-person record of AI tool usage, required
+  for the Individual Effort Verification multiplier
 
 ### Pending before submission (not yet in the repo)
 
-These are required deliverables that are **not present yet** — do not treat them as links
-until the files are committed:
-
-- **Insights & interpretation report** (Merci) — the 3 data-backed insights with derivation
-  and real-world interpretation
-- **AI-usage log** — per-person record of AI tool usage (required for the Individual Effort
-  Verification multiplier)
-- **Assembled PDF report** — the full 2–3 page report combining all team sections
+- **Assembled PDF report** — the full 2–3 page report combining all team sections (architecture
+  & design writeup, algorithm/complexity writeup, plus the two sections above)
 
 ---
 

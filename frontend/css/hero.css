@@ -36,7 +36,6 @@
 .hero__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -45,13 +44,6 @@
   font-weight: 600;
   color: var(--color-text-muted);
   margin-bottom: 16px;
-}
-
-.hero__eyebrow-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-yellow-dark);
 }
 
 .hero__title {

@@ -233,7 +233,7 @@ Available in [`docs/`](docs/):
 > **REQUIRED before submission — placeholder.** A screen-recorded walkthrough of the running
 > system must be linked here. (Cannot be generated automatically.)
 >
-> Video link: _TODO_
+> Video link: https://youtu.be/_DjAD7yMSrM?si=6R3KwN8UC0CjrY2u
 
 ---
 

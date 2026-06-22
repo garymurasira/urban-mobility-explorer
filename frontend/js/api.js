@@ -9,7 +9,7 @@
  * sending them is harmless (ignored server-side) until that lands.
  */
 const API = (function () {
-  const BASE_URL = "http://localhost:5000/api";
+  const BASE_URL = "https://urban-mobility-explorer.onrender.com/api";
 
   // NYC TLC's standard payment_type_id codes (data dictionary), used to
   // label David's /api/insights tips_by_payment rows for display.

@@ -9,16 +9,16 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 
 def get_connection():
-    """Open a new connection to the MySQL database using .env credentials."""
+    host = os.environ["DB_HOST"].strip()
+    port = int(str(os.environ["DB_PORT"]).strip())
+
     return mysql.connector.connect(
-        host=os.environ["DB_HOST"],
-        port=int(os.environ["DB_PORT"]),
-        database=os.environ["DB_NAME"],
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASSWORD"],
+        host=host,
+        port=port,
+        database=os.environ["DB_NAME"].strip(),
+        user=os.environ["DB_USER"].strip(),
+        password=os.environ["DB_PASSWORD"].strip(),
     )
-
-
 def _json_safe(value):
     """Convert DB types that JSON can't handle into plain types."""
     if isinstance(value, Decimal):
@@ -28,14 +28,19 @@ def _json_safe(value):
     return value
 
 
-def run_query(sql, params=None):
-    """Run a SELECT and return rows as a list of JSON-safe dictionaries."""
-    connection = get_connection()
+def run_query(sql, params=None, connection=None):
+    close_conn = False
+
+    if connection is None:
+        connection = get_connection()
+        close_conn = True
+
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(sql, params or ())
         rows = cursor.fetchall()
-        return [{key: _json_safe(val) for key, val in row.items()} for row in rows]
+        return [{k: _json_safe(v) for k, v in row.items()} for row in rows]
     finally:
         cursor.close()
-        connection.close()
+        if close_conn:
+            connection.close()
